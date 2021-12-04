@@ -9,8 +9,8 @@ library(lubridate)
 ```
 
 There are two main problems when dealing with our data:
-
-- *Timestamp* column is in undesirable format
+  
+  - *Timestamp* column is in undesirable format
 - Original dataset is too big to deal with
 
 ## Transforming Timestamp
@@ -32,8 +32,8 @@ Lastly, we use the Timestamp boundaries to mutate a new column to record days of
 ## Splitting datasets
 
 There are three ways to splitting our datasets to make it easier to process:
-
-- Splitting according to week of days, so we focus merely on the fluctuation on a certain day. 
+  
+  - Splitting according to week of days, so we focus merely on the fluctuation on a certain day. 
 - Splitting according to Behavior type. In fact, the clicking behaviors shall occupy 9/10 of data, we can ignore it if we do not focus on the behavior pattern of customers.
 - Splitting according to User_ID. There are about 1 million users in the dataset and it's actually unnecessary for us to just observe trend and make visualization. we can focus on the active buyers, or just randomly select them.
 
@@ -53,13 +53,10 @@ daystart = c(as.POSIXct("2017-11-25 00:00:00",tz="Asia/Shanghai"),
              as.POSIXct("2017-12-1 00:00:00",tz="Asia/Shanghai"),
              as.POSIXct("2017-12-2 00:00:00",tz="Asia/Shanghai"),
              as.POSIXct("2017-12-3 00:00:00",tz="Asia/Shanghai"))
-
 data<-filter(data,Timestamp>=min & Timestamp<=max)
 #sprintf('The number of False Timestamp is: %d ',(100150806-nrow(data)))
-data<- data %>% mutate(day=ifelse(Time<daystart[2],'F_Sat',ifelse(Time<daystart[3],'F_Sun',ifelse(Time<daystart[4],'Mon',ifelse(Time<daystart[5],'Tue',ifelse(Time<daystart[6],'Wed',ifelse(Time<daystart[7],'Thur',ifelse(Time<daystart[8],'Fri',ifelse(Time<daystart[8],'S_Sat','S_Sun')))))))))
-
+data<- data %>% mutate(day=ifelse(Time<daystart[2],'F_Sat',ifelse(Time<daystart[3],'F_Sun',ifelse(Time<daystart[4],'Mon',ifelse(Time<daystart[5],'Tue',ifelse(Time<daystart[6],'Wed',ifelse(Time<daystart[7],'Thur',ifelse(Time<daystart[8],'Fri',ifelse(Time<daystart[9],'S_Sat','S_Sun')))))))))
 set.seed(123)
 Selected_Users = sample(unique(data[,'User_ID']),size=50000)
 data<-filter(data,User_ID %in% Selected_Users) # 5068667 rows,7 columns
 write.csv(data,file = "sample_data.csv")
-```

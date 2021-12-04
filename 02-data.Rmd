@@ -1,2 +1,33 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Data sources
 
+```{r, echo=FALSE}
+df <- read.csv("data/no_pv_data.csv")
+```
+
+The Primary data source of this project is Alibaba's cloud platform [Tianchi](https://tianchi.aliyun.com/). The data set contains 1 million randomly selected user behavior including click, purchase, adding item to shopping cart and item favording during November 25 to December 03 2017. Each row of the dataset represents a specific user-item interaction, with attributes user ID, item ID, item's category ID, behavior type and timestamp in a CSV files. The following table shows the columns of the dataset:
+
+*Dataset: UserBehavior.csv:*
+
+```{r, echo=FALSE}
+description <- c("An integer, the serialized ID that represents a user behavior",
+                 "An integer, the serialized ID that represents a user",
+                 "An integer, the serialized ID that represents an item",
+                 "An integer, the serialized ID that represents the category which the corresponding item belongs to",
+                 "A string, enum-type from ('pv', 'buy', 'cart', 'fav')",
+                 "An integer, the timestamp of the behavior",
+                 "An time data, representing the exact time of the behavior")
+knitr::kable(data.frame(column_names=colnames(df), description=description),col.names=c("Column names", "Discription"))
+```
+
+Problems with the dataset:
+
+1. The dataset is too large with over 100 million entries. A ordinary personal computer cannot handle this file. Our solution is to use a large memeory PC to split the data into several separate files. 
+
+2. The dataset contains one month's user behavior on 2017. This might not be a accurate reflection on the most current user behavior. However, this is the most recent data we can collect.
+
+3. Although user ID, item ID and category ID are provided in the dataset, the actual encoding of these ID's are only avaliable to the company themselves. This bar us from further analyzing the data by categorizing user or items. 

@@ -1,1 +1,21 @@
 # Results
+```{r eval = FALSE, echo=FALSE}
+library(plotly)
+sample_data=read.csv('sample_data.csv')
+```
+
+```{r}
+behavior_count = sort(table(sample_data[,"Behavior_type"]),decreasing = TRUE)
+
+fig <- plot_ly(
+  type = "funnelarea",
+  text = names(behavior_count),
+  values = behavior_count)
+
+fig
+```
+
+```{r}
+no_pv_behavior = filter(sample_data,Behavior_type!='pv')
+sample_data %>% group_by(day) %>% count
+```
