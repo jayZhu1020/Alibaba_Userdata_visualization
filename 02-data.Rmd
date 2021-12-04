@@ -21,6 +21,7 @@ description <- c("An integer, the serialized ID that represents a user behavior"
                  "A string, enum-type from ('pv', 'buy', 'cart', 'fav')",
                  "An integer, the timestamp of the behavior",
                  "An time data, representing the exact time of the behavior")
+
 knitr::kable(data.frame(column_names=colnames(df), description=description),col.names=c("Column names", "Discription"))
 ```
 

@@ -18,7 +18,6 @@ There are two main problems when dealing with our data:
 First, we mutate a new column *Time* by using as_datatime. Given our data took place in China, we shall set timezone at Asia/Shanghai;
 ```{r eval = FALSE, echo=FALSE}
 data=read.csv('UserBehavior.csv') # 100150806 rows,5 columns
-data <- na.omit(data) # no missing value
 colnames(data) <-c('User_ID','Item_ID','Category_ID','Behavior_type','Timestamp')
 data<- data %>% mutate(Time=as_datetime(Timestamp,tz='Asia/Shanghai'))
 ```
@@ -59,4 +58,6 @@ data<- data %>% mutate(day=ifelse(Time<daystart[2],'F_Sat',ifelse(Time<daystart[
 set.seed(123)
 Selected_Users = sample(unique(data[,'User_ID']),size=50000)
 data<-filter(data,User_ID %in% Selected_Users) # 5068667 rows,7 columns
+
 write.csv(data,file = "sample_data.csv")
+```
