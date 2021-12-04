@@ -1,1 +1,123 @@
 # Missing values
+
+```{r echo=FALSE}
+na_plots<-function(data,type='percent'){
+  
+  missing_patterns <- data.frame(is.na(data)) %>%
+  group_by_all() %>%
+  count(name = "count", sort = TRUE) %>%
+  ungroup()
+  
+  # add an id for each row
+  num_rows <- nrow(data)
+  missing_patterns <- missing_patterns %>% 
+    mutate(pattern_id=-row_number(),.before=1)
+  
+  if(type=='percent'){
+    # count the percentage of missing patterns with respect to the total number of rows:
+    # pattern_id => the id for that pattern and count indicates the 
+    # count => percentage for that variable missing in terms of all rows
+    row_count <- missing_patterns %>% 
+      select(pattern_id, count) %>%
+      mutate(count=100*(count/num_rows))
+    
+    # count the percentage of NA for each variable with respect to the total number of rows:
+    # variable => the column variable
+    # count => the percentage for that variable
+    col_count <- data %>% 
+      summarise_all(~ 100*sum(is.na(.x))/num_rows) %>% 
+      pivot_longer(cols=everything(), names_to="variable", values_to="count") %>% 
+      arrange(desc(count))
+  }
+  else if(type=='counts'){
+    row_count <- missing_patterns %>% 
+      select(pattern_id, count)
+    col_count<-data %>% 
+      summarise_all(~ sum(is.na(.x))) %>%
+      pivot_longer(cols=everything(), names_to="variable", values_to="count") %>% 
+      arrange(desc(count))}
+  else{print('Wrong Type Input')}
+    
+  
+  # the data for plotting the main tile graph
+  df_plot <- missing_patterns %>%
+    select(c(pattern_id,col_count$variable)) %>% 
+    gather(key, value, -pattern_id) 
+  
+  cases<-df_plot %>% group_by(pattern_id) %>% 
+    summarise(total = sum(value)) %>%
+    mutate(complete=ifelse(total==0,1,0))
+  complete_cases <- cases$pattern_id[which(cases$complete==1)]
+  
+  # the main tile graph
+  
+  main <- ggplot(df_plot, aes(x = factor(key, levels = col_count$variable), y = factor(-pattern_id), fill = value)) +
+    geom_tile(color="white") +
+    scale_fill_brewer(palette = "PuRd") +
+    scale_y_discrete(limits=rev) +
+    new_scale_fill()+
+    geom_tile(data=filter(df_plot,pattern_id %in% complete_cases),aes(x = factor(key, levels = col_count$variable), y = factor(-pattern_id)),fill='#9264de')+
+    xlab("variables") +
+    ylab("missing pattern")+
+    theme_bw() +
+    theme(legend.position="none") # this line removes legend
+
+  # find places to note complete cases
+    x = as.integer(ncol(data)/2)+1
+  if(length(complete_cases)!=0){
+    y = nrow(missing_patterns)+complete_cases+1
+    main<-main+geom_text(aes(x=x,y=y,label='complete case'),size=5,family="Times", fontface='bold')+theme(legend.position="none")
+  }
+
+  # the graph at the right
+  right <- ggplot(row_count, aes(y=factor(-pattern_id), x=count,alpha=factor(rev(cases$complete)))) +
+    geom_col(fill="skyblue")+
+    scale_alpha_manual(values = c(0.5,1))+
+    scale_y_discrete(limits=rev) + # this reverse the y axis so that the smallest is the last pattern id
+    ylab("")+
+    theme(legend.position="none")+
+    theme_bw()
+  
+  if(type=='percent'){
+    right<-right+scale_x_continuous(limits=c(0,100), breaks=seq(0,100,by=25)) +
+    xlab("% rows")
+  }
+  else{
+    right<-right+xlab("rows count")
+  }
+  right<-right+theme(legend.position="none")
+    
+
+  # the graph on top
+  up <- ggplot(col_count, aes(x=factor(variable, levels=col_count$variable), y=count)) + 
+    geom_col(fill="skyblue") +
+    xlab("") +
+    theme_bw()
+  if(type=='percent'){
+    up<-up+
+      scale_y_continuous(limits=c(0,100),breaks=seq(0,100,by=25))+
+      ylab("% rows missing:")
+  }
+  else{
+    up<-up+ylab("rows missing:")
+  }
+  up<-up+theme(legend.position="none")
+
+  # define patchwork layout
+  layout <- c(area(2,1,3,2), area(1,1,1,2), area(2,3,3,3))
+
+  # add graphs to layout
+  main + up + right + plot_layout(design=layout)
+}
+```
+
+Our dataset has no missing pattern:
+```{r, echo=FALSE}
+df <- read.csv("sample_data.csv")
+```
+
+```{r}
+na_plots(df, type="counts")
+```
+
+Every data entry in the dataset has been accurately recorded. This again shows the reliability and credibility of this dataset.
