@@ -1,1 +1,65 @@
 # Data transformation
+
+```{r, message=FALSE, warning=FALSE}
+library(here)
+library(readr)
+library(tidyverse)
+library(socviz)
+library(lubridate)
+```
+
+There are two main problems when dealing with our data:
+  
+  - *Timestamp* column is in undesirable format
+- Original dataset is too big to deal with
+
+## Transforming Timestamp
+
+First, we mutate a new column *Time* by using as_datatime. Given our data took place in China, we shall set timezone at Asia/Shanghai;
+```{r eval = FALSE, echo=FALSE}
+data=read.csv('UserBehavior.csv') # 100150806 rows,5 columns
+data <- na.omit(data) # no missing value
+colnames(data) <-c('User_ID','Item_ID','Category_ID','Behavior_type','Timestamp')
+data<- data %>% mutate(Time=as_datetime(Timestamp,tz='Asia/Shanghai'))
+```
+
+Second, by using the combination of *as.numeric* and *as.POSIXct*, we can clearly define the *Timestamp* value of the boundaries for each day.
+
+Third, we remove those values which lay out of our boundaries for *2017-11-26* and *2017-12-2*. There are 55576 such values in total.
+
+Lastly, we use the Timestamp boundaries to mutate a new column to record days of the week, and this will be useful for us to splitting our data into parts later.
+
+## Splitting datasets
+
+There are three ways to splitting our datasets to make it easier to process:
+  
+  - Splitting according to week of days, so we focus merely on the fluctuation on a certain day. 
+- Splitting according to Behavior type. In fact, the clicking behaviors shall occupy 9/10 of data, we can ignore it if we do not focus on the behavior pattern of customers.
+- Splitting according to User_ID. There are about 1 million users in the dataset and it's actually unnecessary for us to just observe trend and make visualization. we can focus on the active buyers, or just randomly select them.
+
+Finally, we choose the last method and randomly select 50,000 Users. There are 5,068,667 rows after selection, which is approximately 1/20 of original dataset and corresponds to the the size of Users pretty well.
+
+Please go to our [github repo chapter](https://github.com/jayZhu1020/Alibaba_Userdata_visualization/blob/main/03-cleaning.Rmd) to see code in detail.
+
+```{r eval = FALSE, echo=FALSE}
+min =  as.numeric(as.POSIXct("2017-11-25 00:00:00",tz="Asia/Shanghai"))
+max =  as.numeric(as.POSIXct("2017-12-3 24:00:00",tz="Asia/Shanghai"))
+daystart = c(as.POSIXct("2017-11-25 00:00:00",tz="Asia/Shanghai"),
+             as.POSIXct("2017-11-26 00:00:00",tz="Asia/Shanghai"),
+             as.POSIXct("2017-11-27 00:00:00",tz="Asia/Shanghai"),
+             as.POSIXct("2017-11-28 00:00:00",tz="Asia/Shanghai"),
+             as.POSIXct("2017-11-29 00:00:00",tz="Asia/Shanghai"),
+             as.POSIXct("2017-11-30 00:00:00",tz="Asia/Shanghai"),
+             as.POSIXct("2017-12-1 00:00:00",tz="Asia/Shanghai"),
+             as.POSIXct("2017-12-2 00:00:00",tz="Asia/Shanghai"),
+             as.POSIXct("2017-12-3 00:00:00",tz="Asia/Shanghai"))
+
+data<-filter(data,Timestamp>=min & Timestamp<=max)
+#sprintf('The number of False Timestamp is: %d ',(100150806-nrow(data)))
+data<- data %>% mutate(day=ifelse(Time<daystart[2],'F_Sat',ifelse(Time<daystart[3],'F_Sun',ifelse(Time<daystart[4],'Mon',ifelse(Time<daystart[5],'Tue',ifelse(Time<daystart[6],'Wed',ifelse(Time<daystart[7],'Thur',ifelse(Time<daystart[8],'Fri',ifelse(Time<daystart[9],'S_Sat','S_Sun')))))))))
+
+set.seed(123)
+Selected_Users = sample(unique(data[,'User_ID']),size=50000)
+data<-filter(data,User_ID %in% Selected_Users) # 5068667 rows,7 columns
+write.csv(data,file = "sample_data.csv")
+```
