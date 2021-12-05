@@ -2,22 +2,48 @@
 
 ```{r eval = FALSE, echo=FALSE}
 library(plotly)
+library(tidyverse)
+library(lubridate)
 sample_data=read.csv('sample_data.csv')
 ```
 
-```{r}
+In China, people might prefer to add something to cart just because they like it at that moment, but this does not necessarily mean they will buy it in a few hours. So we decide to interpret `fav` and `cart` as the same type of behavior and call it `fav&cart`.
+
+We first draw a funnel chart to see the percentage of different kinds of User Behaviors. As we can see in Fig 1, clicking behavior has taken most of the part, and buying only takes 2% of the total behaviors, which is a baseline and we will talk about it later. It might come to our mind that this distribution shall be rather stationary, which means users click similar times everyday, and the conversion rate for them to turn their clicking into buying this staff shall be the same.
+
+```{r eval = FALSE, echo=FALSE}
+sample_data[sample_data$Behavior_type %in% c('fav','cart'),'Behavior_type']='fav&cart'
 behavior_count = sort(table(sample_data[,"Behavior_type"]),decreasing = TRUE)
 
 fig <- plot_ly(
   type = "funnelarea",
   text = names(behavior_count),
-  values = behavior_count)
+  values = behavior_count,
+  title='Fig1:Funnel Chart of fraction bewteen different behavior')
 
 fig
 ```
 
 ```{r}
-no_pv_behavior = filter(sample_data,Behavior_type!='pv')
-sample_data %>% group_by(day) %>% count
+sample_data <- sample_data %>% mutate(Hour=hour(Time)) %>% mutate(Date = date(Time)) %>% pivot_longer()
+hour_sum <- sample_data %>% group_by(Hour,Behavior_type) %>% count %>% pivot_wider(names_from = Behavior_type,values_from = n)
+Date_sum <- sample_data %>% group_by(Date,Behavior_type) %>% count %>% pivot_wider(names_from = Behavior_type,values_from = n)
 ```
 
+So we tried to draw a distribution of clicking and buying behavior in a day. In Fig 2, it is not surprising for us to see that the clicking behavior is rather stationary during the day time from 10am to 6pm. However, the clicking behaviors gradually increase by 80% between 6pm and 9pm. It clearly shows that Chinese online shopping users would like to go through the online stores as a recreation after work.
+
+The thing becomes even more interesting if we look at Fig 3. We make a graph using the amount of buying behaviors divide by the amount of clicking behaviors. In the funnel chart, the average ratio of buy/pv is about 2.2% in total.However, if we try to look at this ratio deeper, it seems that after 6pm, when people start to click on the app in high frequency, it seems that their clicking behavior cannot turning into buying behavior at the same scale. This also proves that people might regard searching and merely looking online merchandise as recreation.
+
+```{r}
+# difference between click and buy
+ggplot(hour_sum,aes(x=Hour, y=pv))+
+  geom_line()+
+  ggtitle('Fig2: Trend of Clicking behavior in a day')
+
+temp<-hour_sum %>% mutate(ratio_pv_buy=buy/pv)
+ggplot(temp,aes(x=Hour))+
+  geom_line(aes(y=ratio_pv_buy))+
+  geom_hline(yintercept = sum(hour_sum$buy)/sum(hour_sum$pv),color='red')+
+  ylab('ratio')+
+  ggtitle('Fig3: Trend of Buy/Click behavior in a day')
+```
