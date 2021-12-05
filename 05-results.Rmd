@@ -82,16 +82,15 @@ The first line graph shows the total number of user clicking behaviors. As we ca
 
 ## Analysis by Item Category
 
-Another question is that: does conversion rate keep constant between popular items and the others? Or, does people are more likely to buy the stuff which they click a lot? To do this, first we find out there are 4186 kind of items are bought. We divide them into 9 groups according to their clicking times, and calculate their conversion = buy/clicking. Here we get Fig 6 below:
+Another question is that: does conversion rate keep constant between popular items and the others? Or, does people are more likely to buy the stuff which they click a lot? To do this, first we find out there are 4186 kind of items are bought. We divide them into 5 groups according to their clicking times, and calculate their conversion = buy/clicking. Here we get Fig 6 below:
 
 ```{r}
-# 热门商品转化率低
 tmp<-filter(sample_data,Behavior_type=='pv')
 frequence_categories = names(sort(table(tmp$Category_ID),decreasing=TRUE))
-conversion_Categories = rep(0,9)
 
-sorting_conversion <- function(gap){
-  for(i in c(1:9)){
+sorting_conversion <- function(gap,class){
+  conversion_Categories = rep(0,class)
+  for(i in c(1:class)){
     s = 1+gap*(i-1)
     t =  gap*i
     categories = frequence_categories[s:t]
@@ -100,13 +99,12 @@ sorting_conversion <- function(gap){
     buy = sum(freq_data$Behavior_type=='buy')
     conversion_Categories[i] = buy/pv
   }
-  names = sprintf("group[%s]",seq(1:9))
+  names = sprintf("group[%s]",seq(1:class))
   conversion_Categories <- data_frame(names=names,value=conversion_Categories)
   return(ggplot(conversion_Categories,aes(x=names,y=value))+
     geom_bar(stat = "identity", width = .75, fill = "lightblue"))
 }
 
-fig6<-sorting_conversion(450)
-fig7<-sorting_conversion(100)
-fig6+fig7
+fig6<-sorting_conversion(800,5)
+fig6
 ```
