@@ -4,8 +4,11 @@
 library(plotly)
 library(tidyverse)
 library(lubridate)
+library(patchwork)
 sample_data=read.csv('sample_data.csv')
 ```
+
+## Overview of dataset
 
 In China, people might prefer to add something to cart just because they like it at that moment, but this does not necessarily mean they will buy it in a few hours. So we decide to interpret `fav` and `cart` as the same type of behavior and call it `fav&cart`.
 
@@ -25,10 +28,12 @@ fig
 ```
 
 ```{r}
-sample_data <- sample_data %>% mutate(Hour=hour(Time)) %>% mutate(Date = date(Time)) %>% pivot_longer()
+sample_data <- sample_data %>% mutate(Hour=hour(Time),Date = date(Time))
 hour_sum <- sample_data %>% group_by(Hour,Behavior_type) %>% count %>% pivot_wider(names_from = Behavior_type,values_from = n)
 Date_sum <- sample_data %>% group_by(Date,Behavior_type) %>% count %>% pivot_wider(names_from = Behavior_type,values_from = n)
 ```
+
+## Analysis by Hours
 
 So we tried to draw a distribution of clicking and buying behavior in a day. In Fig 2, it is not surprising for us to see that the clicking behavior is rather stationary during the day time from 10am to 6pm. However, the clicking behaviors gradually increase by 80% between 6pm and 9pm. It clearly shows that Chinese online shopping users would like to go through the online stores as a recreation after work.
 
@@ -36,14 +41,72 @@ The thing becomes even more interesting if we look at Fig 3. We make a graph usi
 
 ```{r}
 # difference between click and buy
-ggplot(hour_sum,aes(x=Hour, y=pv))+
+fig2<-ggplot(hour_sum,aes(x=Hour, y=pv))+
   geom_line()+
   ggtitle('Fig2: Trend of Clicking behavior in a day')
 
 temp<-hour_sum %>% mutate(ratio_pv_buy=buy/pv)
-ggplot(temp,aes(x=Hour))+
+fig3<-ggplot(temp,aes(x=Hour))+
   geom_line(aes(y=ratio_pv_buy))+
   geom_hline(yintercept = sum(hour_sum$buy)/sum(hour_sum$pv),color='red')+
   ylab('ratio')+
   ggtitle('Fig3: Trend of Buy/Click behavior in a day')
+fig2+fig3
+```
+## Analysis by days
+
+```{r}
+fig4<-ggplot(Date_sum, aes(Date, pv)) +  
+    geom_label(aes(label = wday(Date, label = TRUE))) +  
+    geom_line(color = "cornflowerblue") +   
+    scale_x_date(date_labels = "%b\n%d",  
+                 date_breaks = "1 day")+
+  ggtitle('Fig4: Trend of Clicking behavior bewteen days')
+
+
+fig5<-ggplot(Date_sum, aes(Date, buy)) +  
+    geom_label(aes(label = wday(Date, label = TRUE))) +  
+    geom_line(color = "cornflowerblue") +   
+    scale_x_date(date_labels = "%b\n%d",  
+                 date_breaks = "1 day")+
+  ggtitle('Fig5: Trend of Buying behavior bewteen days')
+fig4+fig5
+```
+The first line graph shows the total number of user clicking behaviors. As we can clearly see in the graph, on November 25, November 26, the user clicking activity is relatively higher, but starting from Monday, the number of user clicking behavior strictly decreases. More surprisingly, on December 2, the total number of user behavior rocketed by about 20% compared to that of Friday, and on Sunday December 3, the user activity stays high. We made two oberservation about the user behavior:
+
+1. The user clicking behaviors tended to be high on weekend and low on weekdays. This is understandable since people might not have free time browing the website while working.
+
+2. The user clicking behaviors stayed relatively constant during the weekday. 
+
+3. The user clicking behaviors suprisingly rocketed on December 2. Our conjecture is that the increase is due to the famous double-12 shopping festival created by Alibaba, which officially starts on December 12 each year when Alibaba offers discounts and promotions for most of the products online.
+
+## Analysis by Item Category
+
+Another question is that: does conversion rate keep constant between popular items and the others? Or, does people are more likely to buy the stuff which they click a lot? To do this, first we find out there are 4186 kind of items are bought. We divide them into 9 groups according to their clicking times, and calculate their conversion = buy/clicking. Here we get Fig 6 below:
+
+```{r}
+# 热门商品转化率低
+tmp<-filter(sample_data,Behavior_type=='pv')
+frequence_categories = names(sort(table(tmp$Category_ID),decreasing=TRUE))
+conversion_Categories = rep(0,9)
+
+sorting_conversion <- function(gap){
+  for(i in c(1:9)){
+    s = 1+gap*(i-1)
+    t =  gap*i
+    categories = frequence_categories[s:t]
+    freq_data = sample_data %>% filter(Category_ID %in% categories)
+    pv = sum(freq_data$Behavior_type=='pv')
+    buy = sum(freq_data$Behavior_type=='buy')
+    conversion_Categories[i] = buy/pv
+  }
+  names = sprintf("group[%s]",seq(1:9))
+  conversion_Categories <- data_frame(names=names,value=conversion_Categories)
+  return(ggplot(conversion_Categories,aes(x=names,y=value))+
+    geom_bar(stat = "identity", width = .75, fill = "lightblue"))
+}
+
+fig6<-sorting_conversion(450)
+fig7<-sorting_conversion(100)
+fig6+fig7
 ```
