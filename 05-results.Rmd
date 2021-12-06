@@ -108,3 +108,10 @@ sorting_conversion <- function(gap,class){
 fig6<-sorting_conversion(800,5)
 fig6
 ```
+As we can see in the graph above, the higher the clicking rate a product category has, the lower its conversion rate is. In another word, those product that were viewed most frequenly are less likely to be bought by the user. We made three conjecture about this behavior:
+
+1. This can be due to the fact that the product with the highest clicking rate are the ones that are commonly recommended by the recommender system. People might be interested in clicking the product but they might already have an ideal product in their mind. Therefore, they are less likely to buy them. 
+
+2. Those product are the ones that catches people's attention but are too costly. For example, people like to click on luxury products such as gaming laptops or designer clothing, but are unlikely to buy them due to the high price. 
+
+3. This can also be due to malicious user behavior, such as click-farming. This is a common problem for US online shopping platform such as Ebay and Amazon, where users are paid to click or buy a product to increase its popularity in the recommender system.
