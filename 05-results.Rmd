@@ -87,7 +87,6 @@ Another question is that: does conversion rate keep constant between popular ite
 ```{r}
 tmp<-filter(sample_data,Behavior_type=='pv')
 frequence_categories = names(sort(table(tmp$Category_ID),decreasing=TRUE))
-
 sorting_conversion <- function(gap,class){
   conversion_Categories = rep(0,class)
   for(i in c(1:class)){
@@ -102,7 +101,7 @@ sorting_conversion <- function(gap,class){
   names = sprintf("group[%s]",seq(1:class))
   conversion_Categories <- data_frame(names=names,value=conversion_Categories)
   return(ggplot(conversion_Categories,aes(x=names,y=value))+
-    geom_bar(stat = "identity", width = .75, fill = "lightblue"))
+    geom_bar(stat = "identity", width = .75, fill = "#0073C2FF")+xlab('Groups')+ylab('Conversion Rate'))
 }
 
 fig6<-sorting_conversion(800,5)
@@ -115,3 +114,34 @@ As we can see in the graph above, the higher the clicking rate a product categor
 2. Those product are the ones that catches people's attention but are too costly. For example, people like to click on luxury products such as gaming laptops or designer clothing, but are unlikely to buy them due to the high price. 
 
 3. This can also be due to malicious user behavior, such as click-farming. This is a common problem for US online shopping platform such as Ebay and Amazon, where users are paid to click or buy a product to increase its popularity in the recommender system.
+
+## Analysis the relationship bewteen fav&cart and buy
+
+Here we are trying to analysis how buying behavior is affected by fav&cart behavior. Since our trading data is cut from the whole time flow, it's possible that someone fav&cart an item before the start time of our data and buy it during the 9 days(in our data time span), or vice versa. So here we just focus on existing fav&cart-buy pair and see its pattern.
+
+To do this, we filter out those items one customer fav&cart and buy, and calculate difference of time for these two behaviors. In fact, there is a small portion of data which is negative (only 5.4%, 23654 sample size in total), which is rather logical and prove the feasibility of our analysis. We will ignore the negative values and plot the time diff bar plot:
+
+```{r}
+tmp <- filter(sample_data,Behavior_type!='pv') %>% mutate(User_Item=paste(as.character(User_ID),as.character(Item_ID),sep='_'))
+
+pair <- tmp %>% select(c(User_ID,Item_ID,Behavior_type)) %>% distinct() %>% group_by(User_ID,Item_ID) %>% summarise(count=n(),.groups = 'drop') %>% filter(count>1) %>% mutate(User_Item=paste(as.character(User_ID),as.character(Item_ID),sep='_'))
+
+tmp <- filter(tmp,User_Item%in%pair$User_Item) %>%distinct(Behavior_type,User_Item,.keep_all = TRUE)
+
+tmp_buy <- tmp%>% filter(Behavior_type=='buy')
+tmp_fc <- tmp%>% filter(Behavior_type=='fav&cart')
+tmp_buy <- tmp_buy[order(tmp_buy$User_Category),]
+tmp_fc <- tmp_fc[order(tmp_fc$User_Category),]
+
+time_diff = round(difftime(tmp_buy$Time,tmp_fc$Time,units = "days"))
+time_diff = table(time_diff[time_diff>=0])
+time_diff <-data.frame(names=names(time_diff),value=as.numeric(time_diff))
+fig7<-ggplot(time_diff, aes(x=names,y=value)) +
+  geom_bar(stat='identity',fill = "#0073C2FF")+
+  xlab("Days")+
+  ylab('Amount')+
+  ggtitle('Time diff bewteen buy and fav&cart behaviors(days)')
+fig7
+```
+
+From the graph, it is obvious that most people tend to pay for their noted items in 2 days(about 75%),and the possibility is strictly decreasing. Surely, this is due to our limited time span, those trade in long time span are more likely to not be recorded in data. However, this provide us a good way to think about: when you fav&cart a item, what is the likelihood that you will buy it? What's more, what's the minor difference between fav and cart? We may explore it from the time diff and the likelihood to pay for different behaviors.
