@@ -145,3 +145,49 @@ fig7
 ```
 
 From the graph, it is obvious that most people tend to pay for their noted items in 2 days(about 75%),and the possibility is strictly decreasing. Surely, this is due to our limited time span, those trade in long time span are more likely to not be recorded in data. However, this provide us a good way to think about: when you fav&cart a item, what is the likelihood that you will buy it? What's more, what's the minor difference between fav and cart? We may explore it from the time diff and the likelihood to pay for different behaviors.
+
+## Analysis of outlier
+
+We highly suspect that the most frequent user are click-farming. However, they could just be extremely enthusiastic about onlinen shopping. To find out which hypothesis is correct, we first retrieve the number of activities that each single user performs and plot them in a box plot. Figure 8 diaplays the boxplot displaying the number of user activities over the 9 days:
+
+```{r}
+boxplot_data <- sample_data %>%
+  group_by(User_ID) %>%
+  summarise(freq = n()) %>%
+  arrange(desc(freq))
+
+fig8 <- ggplot(boxplot_data) +
+  ggtitle("Fig8: distribution of the number of 9-day aggregate activities") +
+  geom_boxplot(aes(x=freq), outlier.color="red") +
+  xlab("Number of user activities") +
+  geom_vline(aes(xintercept = median(freq)), color = "blue")
+  
+fig8
+```
+
+We colored all the outliers in red in the graph above. The boxplot further made us suepect those with extremely high activity level are abnormal users, since they clustered around a very high level of number of activities. As we can see in the graph, the interquartile represents the number of normal user activities which range from approximately 50 to 150 over the 9 day period. On the other hand, the extreme outliers can carry out almost 800 activities, this is about 5 times more than the most actival normal users. Therefore, we highly suspect that the users at the very right side of the boxplot are click-farming. Therefore, in order to further confirm this, we further analyze the most frequent user's behavior. 
+
+In Figure 8, we selected the most frequent user who carries out about 800 activities over the 9 day period. We look at the total number activities they made:
+
+```{r}
+most_freq <- boxplot_data %>% slice(1)
+most_freq <- most_freq$User_ID
+most_freq
+
+item_freq <- sample_data %>% filter(User_ID==most_freq) %>%
+  group_by(Item_ID) %>%
+  summarise(freq = n()) %>%
+  group_by(freq) %>%
+  summarise(count=n())
+
+item_freq
+fig9 <- ggplot(item_freq,aes(x=freq, y=count)) +
+  geom_bar(stat = "identity", width = .75, fill = "lightblue") +
+  ggtitle("Fig9: the frequency of the product ") +
+  xlab("the number of activities on a single product") +
+  ylab("frequency of the case happening")
+
+fig9
+```
+
+Unluckily, we are unable to confirm our conjecture that the active user is malicious ones just from the figure above. If the user is a malicious one, it should spend excessively large amout of activities on a few targeted single product. However, their behavior is sparsely scattered into different products. He or she could just simply be addictive to viewing various products.
