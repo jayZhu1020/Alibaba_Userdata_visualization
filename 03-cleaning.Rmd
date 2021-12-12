@@ -16,7 +16,7 @@ There are two main problems when dealing with our data:
 ## Transforming Timestamp
 
 First, we mutate a new column *Time* by using as_datatime. Given our data took place in China, we shall set timezone at Asia/Shanghai;
-```{r eval=False, echo =False}
+```{r,eval=False, echo =False}
 data=read.csv('UserBehavior.csv') # 100150806 rows,5 columns
 colnames(data) <-c('User_ID','Item_ID','Category_ID','Behavior_type','Timestamp')
 data<- data %>% mutate(Time=as_datetime(Timestamp,tz='Asia/Shanghai'))
@@ -32,7 +32,7 @@ Lastly, we use the Timestamp boundaries to mutate a new column to record days of
 
 There are three ways to splitting our datasets to make it easier to process:
   
-  - Splitting according to week of days, so we focus merely on the fluctuation on a certain day. 
+- Splitting according to week of days, so we focus merely on the fluctuation on a certain day. 
 - Splitting according to Behavior type. In fact, the clicking behaviors shall occupy 9/10 of data, we can ignore it if we do not focus on the behavior pattern of customers.
 - Splitting according to User_ID. There are about 1 million users in the dataset and it's actually unnecessary for us to just observe trend and make visualization. we can focus on the active buyers, or just randomly select them.
 
@@ -40,7 +40,7 @@ Finally, we choose the last method and randomly select 50,000 Users. There are 5
 
 Please go to our [github repo chapter](https://github.com/jayZhu1020/Alibaba_Userdata_visualization/blob/main/03-cleaning.Rmd) to see code in detail.
 
-```{r eval=False, echo =False}
+```{r,eval=False, echo =False}
 min =  as.numeric(as.POSIXct("2017-11-25 00:00:00",tz="Asia/Shanghai"))
 max =  as.numeric(as.POSIXct("2017-12-3 24:00:00",tz="Asia/Shanghai"))
 daystart = c(as.POSIXct("2017-11-25 00:00:00",tz="Asia/Shanghai"),
