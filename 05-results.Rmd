@@ -5,7 +5,6 @@ library(plotly)
 library(tidyverse)
 library(lubridate)
 library(patchwork)
-sample_data=read.csv('sample_data.csv')
 ```
 
 ## Overview of dataset
@@ -14,7 +13,7 @@ In China, people might prefer to add something to cart just because they like it
 
 We first draw a funnel chart to see the percentage of different kinds of User Behaviors. As we can see in Fig 1, clicking behavior has taken most of the part, and buying only takes 2% of the total behaviors, which is a baseline and we will talk about it later. It might come to our mind that this distribution shall be rather stationary, which means users click similar times everyday, and the conversion rate for them to turn their clicking into buying this staff shall be the same.
 
-```{r eval = FALSE, echo=FALSE}
+```{r}
 sample_data[sample_data$Behavior_type %in% c('fav','cart'),'Behavior_type']='fav&cart'
 behavior_count = sort(table(sample_data[,"Behavior_type"]),decreasing = TRUE)
 
@@ -130,8 +129,8 @@ tmp <- filter(tmp,User_Item%in%pair$User_Item) %>%distinct(Behavior_type,User_It
 
 tmp_buy <- tmp%>% filter(Behavior_type=='buy')
 tmp_fc <- tmp%>% filter(Behavior_type=='fav&cart')
-tmp_buy <- tmp_buy[order(tmp_buy$User_Category),]
-tmp_fc <- tmp_fc[order(tmp_fc$User_Category),]
+tmp_buy <- tmp_buy[order(tmp_buy$User_Item),]
+tmp_fc <- tmp_fc[order(tmp_fc$User_Item),]
 
 time_diff = round(difftime(tmp_buy$Time,tmp_fc$Time,units = "days"))
 time_diff = table(time_diff[time_diff>=0])
