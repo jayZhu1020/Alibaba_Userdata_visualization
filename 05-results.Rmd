@@ -1,6 +1,6 @@
 # Results
 
-```{r eval = FALSE, echo=FALSE}
+```{r}
 library(plotly)
 library(tidyverse)
 library(lubridate)
