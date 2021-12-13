@@ -9,50 +9,58 @@ library(patchwork)
 
 ## Overview of dataset
 
-In China, people might prefer to add something to cart just because they like it at that moment, but this does not necessarily mean they will buy it in a few hours. So we decide to interpret `fav` and `cart` as the same type of behavior and call it `fav&cart`.
-
-We first draw a funnel chart to see the percentage of different kinds of User Behaviors. As we can see in Fig 1, clicking behavior has taken most of the part, and buying only takes 2% of the total behaviors, which is a baseline and we will talk about it later. It might come to our mind that this distribution shall be rather stationary, which means users click similar times everyday, and the conversion rate for them to turn their clicking into buying this staff shall be the same.
+In China, people might prefer to add items to cart to mark their favorite items, but adding something to cart does not necessarily mean people will buy them in a few hours. Since the difference between `fav` and `cart` is not that clear, we decide to interpret `fav` and `cart` as the same type of behavior and call it `fav&cart` in the main part of analysis.
 
 ```{r}
 sample_data[sample_data$Behavior_type %in% c('fav','cart'),'Behavior_type']='fav&cart'
+```
+
+We first draw a funnel chart to see the percentage of different kinds of User Behaviors. As we can see in Fig 1, clicking behavior has taken most of the part, and buying only takes 2% of the total behaviors, which is a baseline and we will talk about it later. It might come to our mind that this distribution shall be rather stationary, which means users click similar times everyday, and the conversion rate for them to turn their clicking behaviors into buying the staff shall be the same.
+
+```{r}
 behavior_count = sort(table(sample_data[,"Behavior_type"]),decreasing = TRUE)
 
-fig <- plot_ly(
+fig1 <- plot_ly(
   type = "funnelarea",
   text = names(behavior_count),
   values = behavior_count,
   title='Fig1:Funnel Chart of fraction bewteen different behavior')
 
-fig
+fig1
 ```
 
 ```{r}
-sample_data <- sample_data %>% mutate(Hour=hour(Time),Date = date(Time))
 hour_sum <- sample_data %>% group_by(Hour,Behavior_type) %>% count %>% pivot_wider(names_from = Behavior_type,values_from = n)
 Date_sum <- sample_data %>% group_by(Date,Behavior_type) %>% count %>% pivot_wider(names_from = Behavior_type,values_from = n)
+Date_sum$Date<-date(Date_sum$Date)
 ```
 
 ## Analysis by Hours
 
 So we tried to draw a distribution of clicking and buying behavior in a day. In Fig 2, it is not surprising for us to see that the clicking behavior is rather stationary during the day time from 10am to 6pm. However, the clicking behaviors gradually increase by 80% between 6pm and 9pm. It clearly shows that Chinese online shopping users would like to go through the online stores as a recreation after work.
 
-The thing becomes even more interesting if we look at Fig 3. We make a graph using the amount of buying behaviors divide by the amount of clicking behaviors. In the funnel chart, the average ratio of buy/pv is about 2.2% in total.However, if we try to look at this ratio deeper, it seems that after 6pm, when people start to click on the app in high frequency, it seems that their clicking behavior cannot turning into buying behavior at the same scale. This also proves that people might regard searching and merely looking online merchandise as recreation.
+It becomes even more interesting if we look at Fig 3. We make a graph using the amount of buying behaviors divide by the amount of clicking behaviors. In the funnel chart, the average ratio of buy/pv is about 2.2% in total(which is represented by the red line in Fig 3).However, if we try to look at this ratio deeper, we find that after 6pm, when people start to click on the app in high frequency, it seems that their clicking behavior cannot turning into buying behavior at the same scale. This also proves that people might regard searching and merely looking online merchandise as recreation.
 
 ```{r}
 # difference between click and buy
 fig2<-ggplot(hour_sum,aes(x=Hour, y=pv))+
   geom_line()+
-  ggtitle('Fig2: Trend of Clicking behavior in a day')
+  ggtitle('Fig2: Clicking behavior in a day')
 
 temp<-hour_sum %>% mutate(ratio_pv_buy=buy/pv)
 fig3<-ggplot(temp,aes(x=Hour))+
   geom_line(aes(y=ratio_pv_buy))+
   geom_hline(yintercept = sum(hour_sum$buy)/sum(hour_sum$pv),color='red')+
-  ylab('ratio')+
-  ggtitle('Fig3: Trend of Buy/Click behavior in a day')
+  ylab('buy/click ratio')+
+  ggtitle('Fig3: Buy/Click behavior in a day')
 fig2+fig3
 ```
+
 ## Analysis by days
+
+Then we start to observe the data in different days. We might speculate that users might be more active during weekends since they do not need to go to work. However, things become a little bit strange in Fig 4. For the first weekend(Nov 25, Nov 26), there is no significant difference between weekend and weekdays. For the second weekend(Dec 02, Dec 03), the total number of clicking behavior rocketed by about 20% and this is surly significant.
+
+To explain this, our conjecture is that there might be sales promotion during second week. We tried to find past news but nothing was found. To make our conjecture a little bit convincing, we draw the buying behavior for each day in Fig 5. There is one thing rather interesting: Nov 26 and Dec 01 are the days when users are rather active, however their buying behavior are strangely low compared to the next day or the day before. There was a possibility that there were some sales promotion on Nov 27 and Dec 02, so people preferred to go through the app or website to search for items they would like to buy one day before the sales  promotion. This might explain the days with higher user activity receive relatively low order from users.
 
 ```{r}
 fig4<-ggplot(Date_sum, aes(Date, pv)) +  
@@ -60,7 +68,7 @@ fig4<-ggplot(Date_sum, aes(Date, pv)) +
     geom_line(color = "cornflowerblue") +   
     scale_x_date(date_labels = "%b\n%d",  
                  date_breaks = "1 day")+
-  ggtitle('Fig4: Trend of Clicking behavior bewteen days')
+  ggtitle('Fig4: Clicking behavior in days')
 
 
 fig5<-ggplot(Date_sum, aes(Date, buy)) +  
@@ -68,20 +76,14 @@ fig5<-ggplot(Date_sum, aes(Date, buy)) +
     geom_line(color = "cornflowerblue") +   
     scale_x_date(date_labels = "%b\n%d",  
                  date_breaks = "1 day")+
-  ggtitle('Fig5: Trend of Buying behavior bewteen days')
+  ggtitle('Fig5: Buying behavior in days')
 fig4+fig5
 ```
-The first line graph shows the total number of user clicking behaviors. As we can clearly see in the graph, on November 25, November 26, the user clicking activity is relatively higher, but starting from Monday, the number of user clicking behavior strictly decreases. More surprisingly, on December 2, the total number of user behavior rocketed by about 20% compared to that of Friday, and on Sunday December 3, the user activity stays high. We made two oberservation about the user behavior:
 
-1. The user clicking behaviors tended to be high on weekend and low on weekdays. This is understandable since people might not have free time browing the website while working.
-
-2. The user clicking behaviors stayed relatively constant during the weekday. 
-
-3. The user clicking behaviors suprisingly rocketed on December 2. Our conjecture is that the increase is due to the famous double-12 shopping festival created by Alibaba, which officially starts on December 12 each year when Alibaba offers discounts and promotions for most of the products online.
 
 ## Analysis by Item Category
 
-Another question is that: does conversion rate keep constant between popular items and the others? Or, does people are more likely to buy the stuff which they click a lot? To do this, first we find out there are 4186 kind of items are bought. We divide them into 5 groups according to their clicking times, and calculate their conversion = buy/clicking. Here we get Fig 6 below:
+Another question is that: does conversion rate keep constant between popular items and the others? Or, are people more likely to buy the stuff which they click a lot? To do this, first we find out there are 4186 kind of items are bought. We divide them into 5 groups(about 800 category each) according to their clicking times descendingly, and calculate their conversion rate(buy/clicking). Here we get Fig 6 below:
 
 ```{r}
 tmp<-filter(sample_data,Behavior_type=='pv')
@@ -100,15 +102,16 @@ sorting_conversion <- function(gap,class){
   names = sprintf("group[%s]",seq(1:class))
   conversion_Categories <- data_frame(names=names,value=conversion_Categories)
   return(ggplot(conversion_Categories,aes(x=names,y=value))+
-    geom_bar(stat = "identity", width = .75, fill = "#0073C2FF")+xlab('Groups')+ylab('Conversion Rate'))
+    geom_bar(stat = "identity", width = .75, fill = "#0073C2FF")+xlab('Groups')+ylab('Conversion Rate')+
+  ggtitle('Fig6: Conversion Rate among groups'))
 }
 
 fig6<-sorting_conversion(800,5)
 fig6
 ```
-As we can see in the graph above, the higher the clicking rate a product category has, the lower its conversion rate is. In another word, those product that were viewed most frequenly are less likely to be bought by the user. We made three conjecture about this behavior:
+As we can see in the graph above, the higher the clicking rate a product category has, the lower its conversion rate is. In another word, those product that were viewed most frequently are less likely to be bought by the user. We made three conjectures about this behavior:
 
-1. This can be due to the fact that the product with the highest clicking rate are the ones that are commonly recommended by the recommender system. People might be interested in clicking the product but they might already have an ideal product in their mind. Therefore, they are less likely to buy them. 
+1. This can be due to the fact that the product with the highest clicking rate are the ones that are commonly recommended by the system. People might be interested in clicking the product but they might already have an ideal product in their mind. Therefore, they are less likely to buy them. 
 
 2. Those product are the ones that catches people's attention but are too costly. For example, people like to click on luxury products such as gaming laptops or designer clothing, but are unlikely to buy them due to the high price. 
 
@@ -116,7 +119,7 @@ As we can see in the graph above, the higher the clicking rate a product categor
 
 ## Analysis the relationship bewteen fav&cart and buy
 
-Here we are trying to analysis how buying behavior is affected by fav&cart behavior. Since our trading data is cut from the whole time flow, it's possible that someone fav&cart an item before the start time of our data and buy it during the 9 days(in our data time span), or vice versa. So here we just focus on existing fav&cart-buy pair and see its pattern.
+Here we are trying to analysis how buying behavior is affected by fav&cart behavior. Since our trading data is cut from the whole time flow, it's possible that someone fav&cart an item before the start time of our data and buy it during the 9 days(in our data time span), or vice versa. So here we just focus on existing fav&cart-buy pairs and see their pattern.
 
 To do this, we filter out those items one customer fav&cart and buy, and calculate difference of time for these two behaviors. In fact, there is a small portion of data which is negative (only 5.4%, 23654 sample size in total), which is rather logical and prove the feasibility of our analysis. We will ignore the negative values and plot the time diff bar plot:
 
@@ -139,15 +142,67 @@ fig7<-ggplot(time_diff, aes(x=names,y=value)) +
   geom_bar(stat='identity',fill = "#0073C2FF")+
   xlab("Days")+
   ylab('Amount')+
-  ggtitle('Time diff bewteen buy and fav&cart behaviors(days)')
+  ggtitle('Fig7:Time diff bewteen buy and fav&cart behaviors(days)')
 fig7
 ```
 
 From the graph, it is obvious that most people tend to pay for their noted items in 2 days(about 75%),and the possibility is strictly decreasing. Surely, this is due to our limited time span, those trade in long time span are more likely to not be recorded in data. However, this provide us a good way to think about: when you fav&cart a item, what is the likelihood that you will buy it? What's more, what's the minor difference between fav and cart? We may explore it from the time diff and the likelihood to pay for different behaviors.
 
-## Analysis of outlier
+In fact, we search for fav-buy pair and cart-buy pair and use them to calculate `conversion rate of fav = (fav-buy pair amount)/total fav behaviors` and `conversion rate of cart = (cart-buy pair amount)/total fav behaviors`, and we implement the analysis of fav&cart into fav and cart data separately, we shall get the graph below:
 
-We highly suspect that the most frequent user are click-farming. However, they could just be extremely enthusiastic about onlinen shopping. To find out which hypothesis is correct, we first retrieve the number of activities that each single user performs and plot them in a box plot. Figure 8 diaplays the boxplot displaying the number of user activities over the 9 days:
+It shows that most(66.2%) buy-fav pair just happen in half day while buy-cart pair can be more diverse.However, it's more likely for someone pay for the stuff if they add it to cart.
+
+```{r}
+origin_sample_data <- read_csv('sample_data.csv')
+tmp <- filter(origin_sample_data,Behavior_type%in%c('buy','fav')) %>% mutate(User_Item=paste(as.character(User_ID),as.character(Item_ID),sep='_'))
+pair <- tmp %>% select(c(User_ID,Item_ID,Behavior_type)) %>% distinct() %>% group_by(User_ID,Item_ID) %>% summarise(count=n(),.groups = 'drop') %>% filter(count>1) %>% mutate(User_Item=paste(as.character(User_ID),as.character(Item_ID),sep='_'))
+tmp <- filter(tmp,User_Item%in%pair$User_Item) %>%distinct(Behavior_type,User_Item,.keep_all = TRUE)
+tmp_buy <- tmp%>% filter(Behavior_type=='buy')
+tmp_f <- tmp%>% filter(Behavior_type=='fav')
+tmp_buy <- tmp_buy[order(tmp_buy$User_Item),]
+tmp_f <- tmp_f[order(tmp_f$User_Item),]
+time_diff = round(difftime(tmp_buy$Time,tmp_f$Time,units = "days"))
+time_diff = table(time_diff[time_diff>=0])
+time_diff <-data.frame(names=names(time_diff),value=as.numeric(time_diff))
+
+sprintf("The proportion of buying stuff in half day after fav is %f",sum(time_diff$value[1])/sum(time_diff$value))
+
+sprintf("The conversion rate of fav is %f",nrow(tmp_f)/nrow(filter(origin_sample_data,Behavior_type=='fav')))
+
+fig8<-ggplot(time_diff, aes(x=names,y=value)) +
+  geom_bar(stat='identity',fill = "#0073C2FF")+
+  xlab("Days")+
+  ylab('Amount')+
+  ggtitle('Time diff bewteen buy and fav behaviors(days)')
+```
+
+```{r}
+tmp <- filter(origin_sample_data,Behavior_type%in%c('buy','cart')) %>% mutate(User_Item=paste(as.character(User_ID),as.character(Item_ID),sep='_'))
+pair <- tmp %>% select(c(User_ID,Item_ID,Behavior_type)) %>% distinct() %>% group_by(User_ID,Item_ID) %>% summarise(count=n(),.groups = 'drop') %>% filter(count>1) %>% mutate(User_Item=paste(as.character(User_ID),as.character(Item_ID),sep='_'))
+tmp <- filter(tmp,User_Item%in%pair$User_Item) %>%distinct(Behavior_type,User_Item,.keep_all = TRUE)
+tmp_buy <- tmp%>% filter(Behavior_type=='buy')
+tmp_c <- tmp%>% filter(Behavior_type=='cart')
+tmp_buy <- tmp_buy[order(tmp_buy$User_Item),]
+tmp_c <- tmp_c[order(tmp_c$User_Item),]
+time_diff = round(difftime(tmp_buy$Time,tmp_c$Time,units = "days"))
+time_diff = table(time_diff[time_diff>=0])
+time_diff <-data.frame(names=names(time_diff),value=as.numeric(time_diff))
+
+sprintf("The proportion of buying stuff in half day after cart is %f",sum(time_diff$value[1])/sum(time_diff$value))
+
+sprintf("The conversion rate of cart is %f",nrow(tmp_c)/nrow(filter(origin_sample_data,Behavior_type=='cart')))
+
+fig9<-ggplot(time_diff, aes(x=names,y=value)) +
+  geom_bar(stat='identity',fill = "#0073C2FF")+
+  xlab("Days")+
+  ylab('Amount')+
+  ggtitle('Time diff bewteen buy and cart behaviors(days)')
+fig8/fig9
+```
+
+## Analysis of Users
+
+We are curious about User behavior patterns and we first retrieve the number of activities that each single user performs and plot them in a box plot. Figure 10 displays the box plot displaying the number of user activities over the 9 days:
 
 ```{r}
 boxplot_data <- sample_data %>%
@@ -155,38 +210,27 @@ boxplot_data <- sample_data %>%
   summarise(freq = n()) %>%
   arrange(desc(freq))
 
-fig8 <- ggplot(boxplot_data) +
-  ggtitle("Fig8: distribution of the number of 9-day aggregate activities") +
+fig10 <- ggplot(boxplot_data) +
+  ggtitle("Fig10: distribution of the number of 9-day aggregate activities") +
   geom_boxplot(aes(x=freq), outlier.color="red") +
   xlab("Number of user activities") +
   geom_vline(aes(xintercept = median(freq)), color = "blue")
   
-fig8
+fig10
 ```
 
-We colored all the outliers in red in the graph above. The boxplot further made us suepect those with extremely high activity level are abnormal users, since they clustered around a very high level of number of activities. As we can see in the graph, the interquartile represents the number of normal user activities which range from approximately 50 to 150 over the 9 day period. On the other hand, the extreme outliers can carry out almost 800 activities, this is about 5 times more than the most actival normal users. Therefore, we highly suspect that the users at the very right side of the boxplot are click-farming. Therefore, in order to further confirm this, we further analyze the most frequent user's behavior. 
-
-In Figure 8, we selected the most frequent user who carries out about 800 activities over the 9 day period. We look at the total number activities they made:
+We colored all the outliers in red in the graph above and it seems that there are quite a lot of outliers on the right side which means the distribution is right-skewed. After that, we divide our users into two groups, one for the outliers and one for the others, and calculate average number of two groups to see if their behavior pattern might be different.
 
 ```{r}
-most_freq <- boxplot_data %>% slice(1)
-most_freq <- most_freq$User_ID
-most_freq
-
-item_freq <- sample_data %>% filter(User_ID==most_freq) %>%
-  group_by(Item_ID) %>%
-  summarise(freq = n()) %>%
-  group_by(freq) %>%
-  summarise(count=n())
-
-item_freq
-fig9 <- ggplot(item_freq,aes(x=freq, y=count)) +
-  geom_bar(stat = "identity", width = .75, fill = "lightblue") +
-  ggtitle("Fig9: the frequency of the product ") +
-  xlab("the number of activities on a single product") +
-  ylab("frequency of the case happening")
-
-fig9
+Upper_bound = quantile(boxplot_data$freq,0.75)+1.5*IQR(boxplot_data$freq)
+Outlier_Users = boxplot_data$User_ID[boxplot_data$freq>Upper_bound]
+outlier_data = sample_data %>% filter(User_ID%in%Outlier_Users) %>% group_by(Behavior_type) %>% summarise(count=n())
+ordinary_data = sample_data %>% filter(!User_ID%in%Outlier_Users) %>% group_by(Behavior_type) %>% summarise(count=n())
+outlier_data$count<-outlier_data$count/length(Outlier_Users)
+ordinary_data$count<-ordinary_data$count/(length(unique(sample_data$User_ID))-length(Outlier_Users))
+print("The average activity of outlier users:")
+outlier_data
+print("The average activity of ordinary users:")
+ordinary_data
 ```
-
-Unluckily, we are unable to confirm our conjecture that the active user is malicious ones just from the figure above. If the user is a malicious one, it should spend excessively large amout of activities on a few targeted single product. However, their behavior is sparsely scattered into different products. He or she could just simply be addictive to viewing various products.
+It is quite funny that the outlier users buy twice as much stuff than the others on average, however they also pay four times of attention on online shopping activity.
