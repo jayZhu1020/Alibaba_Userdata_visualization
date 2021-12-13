@@ -1,6 +1,7 @@
 # Missing values
 
 ```{r echo=FALSE}
+library(patchwork)
 library(ggnewscale)
 na_plots<-function(data,type='percent'){
   

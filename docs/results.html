@@ -24,7 +24,7 @@
 <meta name="author" content="Yibo Chen and Jiang Zhu" />
 
 
-<meta name="date" content="2021-11-15" />
+<meta name="date" content="2021-12-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,6 +53,13 @@
 
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.10.0.9000/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
 
 
 
@@ -75,10 +82,28 @@
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a></li>
-<li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
+<li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="data-transformation.html"><a href="data-transformation.html#transforming-timestamp"><i class="fa fa-check"></i><b>3.1</b> Transforming Timestamp</a></li>
+<li class="chapter" data-level="3.2" data-path="data-transformation.html"><a href="data-transformation.html#splitting-datasets"><i class="fa fa-check"></i><b>3.2</b> Splitting datasets</a></li>
+</ul></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
-<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
-<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
+<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="results.html"><a href="results.html#overview-of-dataset"><i class="fa fa-check"></i><b>5.1</b> Overview of dataset</a></li>
+<li class="chapter" data-level="5.2" data-path="results.html"><a href="results.html#analysis-by-hours"><i class="fa fa-check"></i><b>5.2</b> Analysis by Hours</a></li>
+<li class="chapter" data-level="5.3" data-path="results.html"><a href="results.html#analysis-by-days"><i class="fa fa-check"></i><b>5.3</b> Analysis by days</a></li>
+<li class="chapter" data-level="5.4" data-path="results.html"><a href="results.html#analysis-by-item-category"><i class="fa fa-check"></i><b>5.4</b> Analysis by Item Category</a></li>
+<li class="chapter" data-level="5.5" data-path="results.html"><a href="results.html#analysis-the-relationship-bewteen-favcart-and-buy"><i class="fa fa-check"></i><b>5.5</b> Analysis the relationship bewteen fav&amp;cart and buy</a></li>
+<li class="chapter" data-level="5.6" data-path="results.html"><a href="results.html#analysis-of-users"><i class="fa fa-check"></i><b>5.6</b> Analysis of Users</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="interactive-component.html"><a href="interactive-component.html#link-to-the-interactive-plot"><i class="fa fa-check"></i><b>6.1</b> Link to the interactive plot:</a></li>
+<li class="chapter" data-level="6.2" data-path="interactive-component.html"><a href="interactive-component.html#description"><i class="fa fa-check"></i><b>6.2</b> Description</a></li>
+<li class="chapter" data-level="6.3" data-path="interactive-component.html"><a href="interactive-component.html#data-transformation-1"><i class="fa fa-check"></i><b>6.3</b> Data transformation</a></li>
+<li class="chapter" data-level="6.4" data-path="interactive-component.html"><a href="interactive-component.html#instructions-for-the-plot"><i class="fa fa-check"></i><b>6.4</b> Instructions for the plot</a></li>
+</ul></li>
 <li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -101,7 +126,72 @@
             <section class="normal" id="section-">
 <div id="results" class="section level1" number="5">
 <h1><span class="header-section-number">Chapter 5</span> Results</h1>
+<div id="overview-of-dataset" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Overview of dataset</h2>
+<p>In China, people might prefer to add items to cart to mark their favorite items, but adding something to cart does not necessarily mean people will buy them in a few hours. Since the difference between <code>fav</code> and <code>cart</code> is not that clear, we decide to interpret <code>fav</code> and <code>cart</code> as the same type of behavior and call it <code>fav&amp;cart</code> in the main part of analysis.</p>
+<p>We first draw a funnel chart to see the percentage of different kinds of User Behaviors. As we can see in Fig 1, clicking behavior has taken most of the part, and buying only takes 2% of the total behaviors, which is a baseline and we will talk about it later. It might come to our mind that this distribution shall be rather stationary, which means users click similar times everyday, and the conversion rate for them to turn their clicking behaviors into buying the staff shall be the same.</p>
+<div id="htmlwidget-117b223547d758bde842" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-117b223547d758bde842">{"x":{"visdat":{"6d61474b9cb4":["function () ","plotlyVisDat"]},"cur_data":"6d61474b9cb4","attrs":{"6d61474b9cb4":{"text":["pv","fav&cart","buy"],"values":[4542890,424319,101458],"title":"Fig1:Funnel Chart of fraction bewteen different behavior","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"funnelarea"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"text":["pv","fav&cart","buy"],"values":[4542890,424319,101458],"title":"Fig1:Funnel Chart of fraction bewteen different behavior","type":"funnelarea","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="analysis-by-hours" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> Analysis by Hours</h2>
+<p>So we tried to draw a distribution of clicking and buying behavior in a day. In Fig 2, it is not surprising for us to see that the clicking behavior is rather stationary during the day time from 10am to 6pm. However, the clicking behaviors gradually increase by 80% between 6pm and 9pm. It clearly shows that Chinese online shopping users would like to go through the online stores as a recreation after work.</p>
+<p>It becomes even more interesting if we look at Fig 3. We make a graph using the amount of buying behaviors divide by the amount of clicking behaviors. In the funnel chart, the average ratio of buy/pv is about 2.2% in total(which is represented by the red line in Fig 3).However, if we try to look at this ratio deeper, we find that after 6pm, when people start to click on the app in high frequency, it seems that their clicking behavior cannot turning into buying behavior at the same scale. This also proves that people might regard searching and merely looking online merchandise as recreation.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+</div>
+<div id="analysis-by-days" class="section level2" number="5.3">
+<h2><span class="header-section-number">5.3</span> Analysis by days</h2>
+<p>Then we start to observe the data in different days. We might speculate that users might be more active during weekends since they do not need to go to work. However, things become a little bit strange in Fig 4. For the first weekend(Nov 25, Nov 26), there is no significant difference between weekend and weekdays. For the second weekend(Dec 02, Dec 03), the total number of clicking behavior rocketed by about 20% and this is surly significant.</p>
+<p>To explain this, our conjecture is that there might be sales promotion during second week. We tried to find past news but nothing was found. To make our conjecture a little bit convincing, we draw the buying behavior for each day in Fig 5. There is one thing rather interesting: Nov 26 and Dec 01 are the days when users are rather active, however their buying behavior are strangely low compared to the next day or the day before. There was a possibility that there were some sales promotion on Nov 27 and Dec 02, so people preferred to go through the app or website to search for items they would like to buy one day before the sales promotion. This might explain the days with higher user activity receive relatively low order from users.</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+</div>
+<div id="analysis-by-item-category" class="section level2" number="5.4">
+<h2><span class="header-section-number">5.4</span> Analysis by Item Category</h2>
+<p>Another question is that: does conversion rate keep constant between popular items and the others? Or, are people more likely to buy the stuff which they click a lot? To do this, first we find out there are 4186 kind of items are bought. We divide them into 5 groups(about 800 category each) according to their clicking times descendingly, and calculate their conversion rate(buy/clicking). Here we get Fig 6 below:</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p>As we can see in the graph above, the higher the clicking rate a product category has, the lower its conversion rate is. In another word, those product that were viewed most frequently are less likely to be bought by the user. We made three conjectures about this behavior:</p>
+<ol style="list-style-type: decimal">
+<li><p>This can be due to the fact that the product with the highest clicking rate are the ones that are commonly recommended by the system. People might be interested in clicking the product but they might already have an ideal product in their mind. Therefore, they are less likely to buy them.</p></li>
+<li><p>Those product are the ones that catches people’s attention but are too costly. For example, people like to click on luxury products such as gaming laptops or designer clothing, but are unlikely to buy them due to the high price.</p></li>
+<li><p>This can also be due to malicious user behavior, such as click-farming. This is a common problem for US online shopping platform such as Ebay and Amazon, where users are paid to click or buy a product to increase its popularity in the recommender system.</p></li>
+</ol>
+</div>
+<div id="analysis-the-relationship-bewteen-favcart-and-buy" class="section level2" number="5.5">
+<h2><span class="header-section-number">5.5</span> Analysis the relationship bewteen fav&amp;cart and buy</h2>
+<p>Here we are trying to analysis how buying behavior is affected by fav&amp;cart behavior. Since our trading data is cut from the whole time flow, it’s possible that someone fav&amp;cart an item before the start time of our data and buy it during the 9 days(in our data time span), or vice versa. So here we just focus on existing fav&amp;cart-buy pairs and see their pattern.</p>
+<p>To do this, we filter out those items one customer fav&amp;cart and buy, and calculate difference of time for these two behaviors. In fact, there is a small portion of data which is negative (only 5.4%, 23654 sample size in total), which is rather logical and prove the feasibility of our analysis. We will ignore the negative values and plot the time diff bar plot:</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<p>From the graph, it is obvious that most people tend to pay for their noted items in 2 days(about 75%),and the possibility is strictly decreasing. Surely, this is due to our limited time span, those trade in long time span are more likely to not be recorded in data. However, this provide us a good way to think about: when you fav&amp;cart a item, what is the likelihood that you will buy it? What’s more, what’s the minor difference between fav and cart? We may explore it from the time diff and the likelihood to pay for different behaviors.</p>
+<p>In fact, we search for fav-buy pair and cart-buy pair and use them to calculate <code>conversion rate of fav = (fav-buy pair amount)/total fav behaviors</code> and <code>conversion rate of cart = (cart-buy pair amount)/total fav behaviors</code>, and we implement the analysis of fav&amp;cart into fav and cart data separately, we shall get the graph below:</p>
+<p>It shows that most(66.2%) buy-fav pair just happen in half day while buy-cart pair can be more diverse.However, it’s more likely for someone pay for the stuff if they add it to cart.</p>
+<pre><code>## [1] &quot;The proportion of buying stuff in half day after fav is 0.661918&quot;</code></pre>
+<pre><code>## [1] &quot;The conversion rate of fav is 0.044993&quot;</code></pre>
+<pre><code>## [1] &quot;The proportion of buying stuff in half day after cart is 0.373897&quot;</code></pre>
+<pre><code>## [1] &quot;The conversion rate of cart is 0.063948&quot;</code></pre>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+</div>
+<div id="analysis-of-users" class="section level2" number="5.6">
+<h2><span class="header-section-number">5.6</span> Analysis of Users</h2>
+<p>We are curious about User behavior patterns and we first retrieve the number of activities that each single user performs and plot them in a box plot. Figure 10 displays the box plot displaying the number of user activities over the 9 days:</p>
+<p><img src="finalproj_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<p>We colored all the outliers in red in the graph above and it seems that there are quite a lot of outliers on the right side which means the distribution is right-skewed. After that, we divide our users into two groups, one for the outliers and one for the others, and calculate average number of two groups to see if their behavior pattern might be different.</p>
+<pre><code>## [1] &quot;The average activity of outlier users:&quot;</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   Behavior_type  count
+##   &lt;chr&gt;          &lt;dbl&gt;
+## 1 buy             3.75
+## 2 fav&amp;cart       25.7 
+## 3 pv            332.</code></pre>
+<pre><code>## [1] &quot;The average activity of ordinary users:&quot;</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   Behavior_type count
+##   &lt;chr&gt;         &lt;dbl&gt;
+## 1 buy            1.94
+## 2 fav&amp;cart       7.62
+## 3 pv            78.8</code></pre>
+<p>It is quite funny that the outlier users buy twice as much stuff than the others on average, however they also pay four times of attention on online shopping activity.</p>
 
+</div>
 </div>
             </section>
 

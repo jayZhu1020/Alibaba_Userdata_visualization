@@ -24,7 +24,7 @@
 <meta name="author" content="Yibo Chen and Jiang Zhu" />
 
 
-<meta name="date" content="2021-11-15" />
+<meta name="date" content="2021-12-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,6 +53,13 @@
 
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.10.0.9000/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
 
 
 
@@ -75,10 +82,28 @@
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a></li>
-<li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
+<li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="data-transformation.html"><a href="data-transformation.html#transforming-timestamp"><i class="fa fa-check"></i><b>3.1</b> Transforming Timestamp</a></li>
+<li class="chapter" data-level="3.2" data-path="data-transformation.html"><a href="data-transformation.html#splitting-datasets"><i class="fa fa-check"></i><b>3.2</b> Splitting datasets</a></li>
+</ul></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
-<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
-<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
+<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="results.html"><a href="results.html#overview-of-dataset"><i class="fa fa-check"></i><b>5.1</b> Overview of dataset</a></li>
+<li class="chapter" data-level="5.2" data-path="results.html"><a href="results.html#analysis-by-hours"><i class="fa fa-check"></i><b>5.2</b> Analysis by Hours</a></li>
+<li class="chapter" data-level="5.3" data-path="results.html"><a href="results.html#analysis-by-days"><i class="fa fa-check"></i><b>5.3</b> Analysis by days</a></li>
+<li class="chapter" data-level="5.4" data-path="results.html"><a href="results.html#analysis-by-item-category"><i class="fa fa-check"></i><b>5.4</b> Analysis by Item Category</a></li>
+<li class="chapter" data-level="5.5" data-path="results.html"><a href="results.html#analysis-the-relationship-bewteen-favcart-and-buy"><i class="fa fa-check"></i><b>5.5</b> Analysis the relationship bewteen fav&amp;cart and buy</a></li>
+<li class="chapter" data-level="5.6" data-path="results.html"><a href="results.html#analysis-of-users"><i class="fa fa-check"></i><b>5.6</b> Analysis of Users</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="interactive-component.html"><a href="interactive-component.html#link-to-the-interactive-plot"><i class="fa fa-check"></i><b>6.1</b> Link to the interactive plot:</a></li>
+<li class="chapter" data-level="6.2" data-path="interactive-component.html"><a href="interactive-component.html#description"><i class="fa fa-check"></i><b>6.2</b> Description</a></li>
+<li class="chapter" data-level="6.3" data-path="interactive-component.html"><a href="interactive-component.html#data-transformation-1"><i class="fa fa-check"></i><b>6.3</b> Data transformation</a></li>
+<li class="chapter" data-level="6.4" data-path="interactive-component.html"><a href="interactive-component.html#instructions-for-the-plot"><i class="fa fa-check"></i><b>6.4</b> Instructions for the plot</a></li>
+</ul></li>
 <li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -101,6 +126,10 @@
             <section class="normal" id="section-">
 <div id="conclusion" class="section level1" number="7">
 <h1><span class="header-section-number">Chapter 7</span> Conclusion</h1>
+<p>By analyzing the dataset through visualization, we had a deeper understanding of the user behavior from the Taobao dataset.</p>
+<p>Firstly, we observed that most of the user behavior consists of clicking an item. This is understandable, however, we surprisingly observe that buying consist of only 2% of the user behavior. This indicates the fundamental difference between online shopping and on-site shopping, where in the former case consumers can quickly browse various products and only choose to buy a small portion of them while in the latter case buying occurs more often. We further investigate the total number of user behaviors by hours, days and item category. We found that clicking and uying does not happen concurrently. People tend to view their products at night and make purchases in the morning or afternoon. Moreover, we also observed thatthe total clicking behavior occurs more frequently during the weekends while less frequently during the weekdays. However, for buying behaviors, it is the complete opposite. By this 2 observations, we can obtain a rough idea about the online shoppers’ behavior. They prefer browing the products during weekend and nights, while buying occurs during weekdays and afternoon. Moreover, we analyze the user behavior by item category. Although the dataset provides no information about the specific item categories, we found one interesting pattern about the categories: the items that were viewed most frequently are the ones whose conversion rate is the lowest.</p>
+<p>Then we further analyzed which action between listing and carting is more likely to indicate a user will finally buy the product. We found that carting a product significantly increases the probability that a user will finally buy a product, while listing a product only slightly increases the users’ will to buy it. This also confirms with our personal experience, where we are more likely to cart the products we really like to buy, while keeping the products that we aren’t ready to spend money on to the list.</p>
+<p>Finally, we investigate the outliers of users. We define the outliers to be the ones with excessively active users. And we foudn that in fact many users exhibit abnormal behaviors with significantly more behaviors than the rest. We suspect that they are click-farming, which has always been a problem not only for Taobao but also other online shopping platform such as Amazon and Ebay. Unlukily, we are unable to draw the conclusion that those users are click-farming since they do not have a large volumn of buying activies. However, we do find interesting behaviors about those users: they are almost fanatic in viewing various products while being very unlikely to buy them. We observe 4 times more clicking behaviors for the excessively active users but only 2 times more buying behaviors. We conclude that those users are simply addictive to clicking on different products and cosnider browing products a hobby for them.</p>
 
 </div>
             </section>

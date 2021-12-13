@@ -24,7 +24,7 @@
 <meta name="author" content="Yibo Chen and Jiang Zhu" />
 
 
-<meta name="date" content="2021-11-15" />
+<meta name="date" content="2021-12-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,6 +53,13 @@
 
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.10.0.9000/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
 
 
 
@@ -75,10 +82,28 @@
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="data-sources.html"><a href="data-sources.html"><i class="fa fa-check"></i><b>2</b> Data sources</a></li>
-<li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
+<li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="data-transformation.html"><a href="data-transformation.html#transforming-timestamp"><i class="fa fa-check"></i><b>3.1</b> Transforming Timestamp</a></li>
+<li class="chapter" data-level="3.2" data-path="data-transformation.html"><a href="data-transformation.html#splitting-datasets"><i class="fa fa-check"></i><b>3.2</b> Splitting datasets</a></li>
+</ul></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
-<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
-<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
+<li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="results.html"><a href="results.html#overview-of-dataset"><i class="fa fa-check"></i><b>5.1</b> Overview of dataset</a></li>
+<li class="chapter" data-level="5.2" data-path="results.html"><a href="results.html#analysis-by-hours"><i class="fa fa-check"></i><b>5.2</b> Analysis by Hours</a></li>
+<li class="chapter" data-level="5.3" data-path="results.html"><a href="results.html#analysis-by-days"><i class="fa fa-check"></i><b>5.3</b> Analysis by days</a></li>
+<li class="chapter" data-level="5.4" data-path="results.html"><a href="results.html#analysis-by-item-category"><i class="fa fa-check"></i><b>5.4</b> Analysis by Item Category</a></li>
+<li class="chapter" data-level="5.5" data-path="results.html"><a href="results.html#analysis-the-relationship-bewteen-favcart-and-buy"><i class="fa fa-check"></i><b>5.5</b> Analysis the relationship bewteen fav&amp;cart and buy</a></li>
+<li class="chapter" data-level="5.6" data-path="results.html"><a href="results.html#analysis-of-users"><i class="fa fa-check"></i><b>5.6</b> Analysis of Users</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="interactive-component.html"><a href="interactive-component.html#link-to-the-interactive-plot"><i class="fa fa-check"></i><b>6.1</b> Link to the interactive plot:</a></li>
+<li class="chapter" data-level="6.2" data-path="interactive-component.html"><a href="interactive-component.html#description"><i class="fa fa-check"></i><b>6.2</b> Description</a></li>
+<li class="chapter" data-level="6.3" data-path="interactive-component.html"><a href="interactive-component.html#data-transformation-1"><i class="fa fa-check"></i><b>6.3</b> Data transformation</a></li>
+<li class="chapter" data-level="6.4" data-path="interactive-component.html"><a href="interactive-component.html#instructions-for-the-plot"><i class="fa fa-check"></i><b>6.4</b> Instructions for the plot</a></li>
+</ul></li>
 <li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -101,7 +126,29 @@
             <section class="normal" id="section-">
 <div id="interactive-component" class="section level1" number="6">
 <h1><span class="header-section-number">Chapter 6</span> Interactive component</h1>
+<div id="link-to-the-interactive-plot" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> Link to the interactive plot:</h2>
+<p>Click <a href="https://vizhub.com/jayZhu1020/1984578017e3456dbdce38a74fa60c24?edit=files">here</a> or copy the url:</p>
+<p><a href="https://vizhub.com/jayZhu1020/1984578017e3456dbdce38a74fa60c24?edit=files" class="uri">https://vizhub.com/jayZhu1020/1984578017e3456dbdce38a74fa60c24?edit=files</a></p>
+</div>
+<div id="description" class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> Description</h2>
+<p>The plot was built with D3 version 6. You can find our code at <a href="https://vizhub.com/jayZhu1020/1984578017e3456dbdce38a74fa60c24?edit=files&amp;file=index.html">vizhub</a>. The line plot shows the total number of user behaviors by hours given a selected date from 2021-11-25 to 2021-12-03, including a functionality of showing the avergae hourly number of user behavior over these 9 days.</p>
+</div>
+<div id="data-transformation-1" class="section level2" number="6.3">
+<h2><span class="header-section-number">6.3</span> Data transformation</h2>
+<p>We found it easier to work with JSON files with javascript. Therefore, we first transform our data into JSON fotmat where we can access each day’s hourly behavior sequence in an Javascript Array. Finally, since we observe that the JSON string is relatively short, we chose to simply copy the JSON string into index.html to simplify the process and avoid calling extra package to load the json file.</p>
+</div>
+<div id="instructions-for-the-plot" class="section level2" number="6.4">
+<h2><span class="header-section-number">6.4</span> Instructions for the plot</h2>
+<p>The plot is initialized with a default value of zero everywhere until the user selects an day to view the data.</p>
+<ol style="list-style-type: decimal">
+<li>Users can use the dropdown box to select an day to view its hourly behavior. This is displayed as the blue line and dots.</li>
+<li>Users can hover over the dots to see the exact value of user behavior during that hour.</li>
+<li>Users can click on the checkbox to display the averge hourly number of behaviors over the 9-day period. It is displayed as the red line and dots.</li>
+</ol>
 
+</div>
 </div>
             </section>
 
