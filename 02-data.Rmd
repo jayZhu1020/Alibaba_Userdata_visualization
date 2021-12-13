@@ -21,7 +21,7 @@ description <- c(
                  "A string, enum-type from ('pv', 'buy', 'cart', 'fav')",
                  "An integer, the timestamp of the behavior")
 
-knitr::kable(data.frame(column_names=colnames(sample_data)[2:6], description=description),col.names=c("Column names", "Discription"))
+knitr::kable(data.frame(column_names=colnames(sample_data)[1:5], description=description),col.names=c("Column names", "Discription"))
 ```
 
 Problems with the dataset:
