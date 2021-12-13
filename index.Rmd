@@ -13,8 +13,8 @@ In this project, we collected the user behavior data in 2017 from Alibaba's data
 
 1. What’s the basic feature of online consumer? (eg. When do they prefer to scan the website? When do they prefer to purchase the item? What’s their favorite item? The distribution of time spending on the website for different consumer?)
 
-2. What is the correlation bewteen item click,buy,add to cart,add favor? (Behavior pattern before purchasing) What’s the difference bewteen “add to cart” and “add favor”? (Many Chinese consumers add lots of items to cart but just do not buy it for a very long time.)
+2. What is the correlation bewteen item click,buy,add to cart,add favor? What’s the difference bewteen “add to cart” and “add favor”? (Many Chinese consumers add lots of items to cart but just do not buy it for a very long time.)
 
-3. What’s the outlier of item? (eg. The items people click a lot but hardly buy; The items people tend to buy them with few behaviors;The items people just add to cart but hardly buy) What’s the correlation bewteen items? (eg.The classic beer and diaper question)
+3. What’s the outlier of item or consumer? What’s the correlation bewteen items? (eg.The classic beer and diaper question)
 
 There are about 1 million users and 100 million interactions, so the interactions can be very detailed and reflects the inner thought of consumers.
