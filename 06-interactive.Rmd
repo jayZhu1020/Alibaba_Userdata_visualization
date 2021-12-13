@@ -1,3 +1,21 @@
 # Interactive component
 
+## Link to the interactive plot:
+Click [here](https://vizhub.com/jayZhu1020/1984578017e3456dbdce38a74fa60c24?edit=files) or copy the url:
 
+https://vizhub.com/jayZhu1020/1984578017e3456dbdce38a74fa60c24?edit=files
+
+## Description
+
+The plot was built with D3 version 6. You can find our code at [vizhub](https://vizhub.com/jayZhu1020/1984578017e3456dbdce38a74fa60c24?edit=files&file=index.html). The line plot shows the total number of user behaviors by hours given a selected date from 2021-11-25 to 2021-12-03, including a functionality of showing the avergae hourly number of user behavior over these 9 days. 
+
+## Data transformation
+
+We found it easier to work with JSON files with javascript. Therefore, we first transform our data into JSON fotmat where we can access each day's hourly behavior sequence in an Javascript Array. Finally, since we observe that the JSON string is relatively short, we chose to simply copy the JSON string into index.html to simplify the process and avoid calling extra package to load the json file. 
+
+## Instructions for the plot
+The plot is initialized with a default value of zero everywhere until the user selects an day to view the data. 
+
+1. Users can use the dropdown box to select an day to view its hourly behavior. This is displayed as the blue line and dots.
+2. Users can hover over the dots to see the exact value of user behavior during that hour.
+3. Users can click on the checkbox to display the averge hourly number of behaviors over the 9-day period. It is displayed as the red line and dots.
