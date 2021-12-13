@@ -19,10 +19,10 @@ We hope to add Four columns from `Timestamp`:
 
 ```{r, echo=FALSE}
 description <- c(
-                 "A %Y-%m-%d %H:%M:%S Time format, representing China local time",
+                 "%Y-%m-%d %H:%M:%S Time format, representing China local time",
                  "A string, representing the day of week",
                  "An integer, representing the specific hour for the record",
-                 "A %Y-%m-%d Time format, representing China local time")
+                 "%Y-%m-%d Time format, representing China local time")
 
 knitr::kable(data.frame(column_names=colnames(sample_data)[6:9], description=description),col.names=c("Column names", "Discription"))
 ```
