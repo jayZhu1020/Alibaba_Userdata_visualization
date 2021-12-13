@@ -21,13 +21,15 @@ description <- c(
                  "A string, enum-type from ('pv', 'buy', 'cart', 'fav')",
                  "An integer, the timestamp of the behavior")
 
-knitr::kable(data.frame(column_names=colnames(sample_data)[1:5], description=description),col.names=c("Column names", "Discription"))
+knitr::kable(data.frame(column_names=colnames(sample_data)[2:6], description=description),col.names=c("Column names", "Discription"))
 ```
 
 Problems with the dataset:
 
-1. The dataset is too large with over 100 million entries. A ordinary personal computer cannot handle this file. Our solution is to use a large memeory PC to split the data into several separate files. 
+1. The dataset is too large for us to deal with since there are over 100 million entries. A ordinary personal computer cannot handle this file. Our solution is to split the data into serveral datesets or just sampling but ensuring representativeness at the same time.
 
-2. The dataset contains one month's user behavior on 2017. This might not be a accurate reflection on the most current user behavior. However, this is the most recent data we can collect.
+2. The dataset contains one month's user behavior on 2017. This might not be a accurate reflection on the most current user behavior, since there might be shopping festival around the time. If customers have just experienced a shopping festival, they are less likely to buy stuff since their need was satisfied not long ago, or there might be a sales promotion during the time. However, this is the most recent data we can collect and it's really hard to track sales promotion 4 years ago.
 
-3. Although user ID, item ID and category ID are provided in the dataset, the actual encoding of these ID's are only avaliable to the company themselves. This bar us from further analyzing the data by categorizing user or items. 
+3. Although user ID, item ID and category ID are provided in the dataset, the actual encoding of these ID's are only avaliable to the company themselves. This bar us from further analyzing the data by categorizing user or items and we believe readers won't prefer to see a long series of Item ID numbers.
+
+*Datasource:* We applied for *UserBehavior.csv* through [this link](https://tianchi.aliyun.com/dataset/dataDetail?dataId=649). Since this document is too large(1G after compression), we might only provide the access for sample_data which we will talk about later.
