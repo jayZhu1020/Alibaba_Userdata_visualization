@@ -8,39 +8,37 @@ library(socviz)
 library(lubridate)
 ```
 
-There are two main problems when dealing with our data:
+In this section, we will mainly focus on two stuff:
   
-  - *Timestamp* column is in undesirable format
-- Original dataset is too big to deal with
+- Transform `Timestamp` column into our needed format
+- Divide or sample from our original dataset to ensure effiency
 
 ## Transforming Timestamp
 
-First, we mutate a new column *Time* by using as_datatime. Given our data took place in China, we shall set timezone at Asia/Shanghai;
+We hope to add Four columns from `Timestamp`:
+
+```{r, echo=FALSE}
+description <- c(
+                 "A %Y-%m-%d %H:%M:%S Time format, representing China local time",
+                 "A string, representing the day of week",
+                 "An integer, representing the specific hour for the record",
+                 "A %Y-%m-%d Time format, representing China local time")
+
+knitr::kable(data.frame(column_names=colnames(sample_data)[6:9], description=description),col.names=c("Column names", "Discription"))
+```
+
+We do this in following steps:
+
+- Mutate a new column `Time` using `as_datatime()` and set `timezone`=Asia/Shanghai
+- Define the boundaries for each day using `as.numeric()` and `as.POSIXct()` function.
+- Delete rows which fall out of our setting boundaries for `2017-11-26` and `2017-12-2`(55576 rows in total)
+- Mutate a new column `day` using boundaries for each day with if...else clauses
+- Mutate new columns `hour` and `Date` using `hour()` and `date()` function
+
 ```{r,eval=FALSE, echo =FALSE}
 data=read.csv('UserBehavior.csv') # 100150806 rows,5 columns
 colnames(data) <-c('User_ID','Item_ID','Category_ID','Behavior_type','Timestamp')
 data<- data %>% mutate(Time=as_datetime(Timestamp,tz='Asia/Shanghai'))
-```
-
-Second, by using the combination of *as.numeric* and *as.POSIXct*, we can clearly define the *Timestamp* value of the boundaries for each day.
-
-Third, we remove those values which lay out of our boundaries for *2017-11-26* and *2017-12-2*. There are 55576 such values in total.
-
-Lastly, we use the Timestamp boundaries to mutate a new column to record days of the week, and this will be useful for us to splitting our data into parts later.
-
-## Splitting datasets
-
-There are three ways to splitting our datasets to make it easier to process:
-  
-- Splitting according to week of days, so we focus merely on the fluctuation on a certain day. 
-- Splitting according to Behavior type. In fact, the clicking behaviors shall occupy 9/10 of data, we can ignore it if we do not focus on the behavior pattern of customers.
-- Splitting according to User_ID. There are about 1 million users in the dataset and it's actually unnecessary for us to just observe trend and make visualization. we can focus on the active buyers, or just randomly select them.
-
-Finally, we choose the last method and randomly select 50,000 Users. There are 5,068,667 rows after selection, which is approximately 1/20 of original dataset and corresponds to the the size of Users pretty well.
-
-Please go to our [github repo chapter](https://github.com/jayZhu1020/Alibaba_Userdata_visualization/blob/main/03-cleaning.Rmd) to see code in detail.
-
-```{r,eval=FALSE, echo =FALSE}
 min =  as.numeric(as.POSIXct("2017-11-25 00:00:00",tz="Asia/Shanghai"))
 max =  as.numeric(as.POSIXct("2017-12-3 24:00:00",tz="Asia/Shanghai"))
 daystart = c(as.POSIXct("2017-11-25 00:00:00",tz="Asia/Shanghai"),
@@ -55,9 +53,24 @@ daystart = c(as.POSIXct("2017-11-25 00:00:00",tz="Asia/Shanghai"),
 data<-filter(data,Timestamp>=min & Timestamp<=max)
 sprintf('The number of False Timestamp is: %d ',(100150806-nrow(data)))
 data<- data %>% mutate(day=ifelse(Time<daystart[2],'F_Sat',ifelse(Time<daystart[3],'F_Sun',ifelse(Time<daystart[4],'Mon',ifelse(Time<daystart[5],'Tue',ifelse(Time<daystart[6],'Wed',ifelse(Time<daystart[7],'Thur',ifelse(Time<daystart[8],'Fri',ifelse(Time<daystart[9],'S_Sat','S_Sun')))))))))
+sample_data <- sample_data %>% mutate(Hour=hour(Time),Date = date(Time))
+```
+
+## Splitting datasets
+
+There are three ways to split our datasets to make it easier to process:
+  
+- Splitting according to week of days, so we focus merely on the fluctuation on a certain day. 
+- Splitting according to Behavior type. In fact, the clicking behaviors shall occupy 90% data, we can ignore it if we do not focus on the behavior pattern of customers.
+- Splitting according to User_ID. There are about 1 million users in the dataset and it's actually unnecessary for us to just observe trend and make visualization. we can focus on the active buyers, or just randomly select them.
+
+Finally, we choose the last method and randomly select 50,000 Users. There are 5,068,667 rows after selection, which is approximately 1/20 of original dataset and corresponds to the the size of Users pretty well. We write down this data into a new file called *sample_data.csv* and will focus on it in later chapters.
+
+Please go to our [github repo chapter](https://github.com/jayZhu1020/Alibaba_Userdata_visualization/blob/main/03-cleaning.Rmd) to see code in detail.
+
+```{r,eval=FALSE, echo =FALSE}
 set.seed(123)
 Selected_Users = sample(unique(data[,'User_ID']),size=50000)
 data<-filter(data,User_ID %in% Selected_Users) # 5068667 rows,7 columns
-
 write.csv(data,file = "sample_data.csv")
 ```
